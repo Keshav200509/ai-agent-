@@ -67,9 +67,12 @@
 
 
 # agent/tools.py
+from dotenv import load_dotenv
+load_dotenv()
 from composio import Composio
 from langchain.tools import tool
 import os
+
 
 composio = Composio(api_key=os.getenv("COMPOSIO_API_KEY"))
 
