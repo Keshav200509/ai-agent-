@@ -11,43 +11,43 @@
 
 
 # agent/test_agent.py
+from dotenv import load_dotenv
+load_dotenv()
+
+# --- Keep the rest of your imports below ---
 from agent.core import run_agent_task
 import os
-import pytest # Make sure to import pytest
+import pytest
 
-def test_run_agent():
+def test_discord_to_gmail_drive_workflow():
     """
-    This is a test function that pytest will automatically find and run.
-    It runs a simple, non-destructive query to see if the agent works.
+    Full integration test:
+    1. Fetch latest message from a test Discord channel.
+    2. Send the message as an email via Gmail.
+    3. Upload that message as a file to Google Drive.
     """
-    print("\n--- [Pytest] Running test_run_agent ---")
-    
-    # Check if secrets are available in the test environment
-    if not os.getenv("COMPOSIO_API_KEY") or not os.getenv("OPENAI_API_KEY"):
-        pytest.skip("API keys not found in environment. Skipping integration test.")
+    discord_channel_id = os.getenv("TEST_DISCORD_CHANNEL_ID", "dummy_channel")
+    email_to = os.getenv("GMAIL_ADDRESS", "your_email@gmail.com")
+    drive_folder = os.getenv("GOOGLE_DRIVE_FOLDER_ID", "root")
 
-    # A simple test query
-    query = "What is the capital of France?"
-    
-    response = run_agent_task(query)
-    
-    # A simple check to see if we got a real, non-empty response
-    assert response is not None
-    assert len(response) > 0
-    
-    print(f"Agent query: {query}")
-    print(f"Agent response: {response}")
-    print("--- [Pytest] Test completed successfully ---")
+    # Step 1: Fetch Discord message
+    message = run_agent_task(f"Get the latest message from Discord channel {discord_channel_id}")
+    assert message is not None and isinstance(message, str)
 
+    # Step 2: Send message via Gmail
+    email_res = run_agent_task(
+        f"Send the following as an email to {email_to}: {message}"
+    )
+    assert "error" not in str(email_res).lower()
 
-# This block still lets you run the file directly as a script
+    # Step 3: Upload message as file to Google Drive
+    upload_res = run_agent_task(
+        f"Upload the following text as a file to Google Drive folder {drive_folder}: {message}"
+    )
+    assert "error" not in str(upload_res).lower()
+    print("Integration workflow successful.")
+
+# Allow CLI running
 if __name__ == "__main__":
-    print("\n--- [Main] Running test_agent.py as a script ---")
-    
-    # Your original test query
-    script_query = "Send an email summary of the last Discord message"
-    response = run_agent_task(script_query)
-    
-    print("\n--- [Main] Script Response ---")
-    print(response)
-    print("----------------------------")
+    print("\n--- [Main] Running full system workflow test ---")
+    test_discord_to_gmail_drive_workflow()
