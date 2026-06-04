@@ -8,7 +8,10 @@ load_dotenv()
 
 from agent.core import AgentError, run_agent_task
 
+_HAS_CREDENTIALS = bool(os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_APPLICATION_CREDENTIALS"))
 
+
+@pytest.mark.skipif(not _HAS_CREDENTIALS, reason="Google/Gemini credentials not available")
 def test_discord_to_gmail_drive_workflow():
     """Full integration test:
     1. Fetch latest message from a test Discord channel.
