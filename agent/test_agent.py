@@ -5,7 +5,13 @@ import pytest
 
 from agent.core import run_agent_task
 
+requires_credentials = pytest.mark.skipif(
+    not os.getenv("GEMINI_API_KEY"),
+    reason="GEMINI_API_KEY not set — skipping integration test",
+)
 
+
+@requires_credentials
 def test_discord_to_gmail_drive_workflow():
     """
     Full integration test:
