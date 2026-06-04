@@ -2,16 +2,21 @@ from agent.config import get_llm
 from agent.tools import tools_list
 from langchain.agents import initialize_agent, AgentType
 
-# Initialize the Gemini LLM via shared factory
-llm = get_llm()
+_agent = None
 
-# Create the Agent using LangChain 0.1.16 compatible method
-agent = initialize_agent(
-    tools=tools_list,
-    llm=llm,
-    agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION,
-    verbose=True,
-)
+
+def _get_agent():
+    """Lazily initialize the agent on first use (avoids import-time credential errors)."""
+    global _agent
+    if _agent is None:
+        llm = get_llm()
+        _agent = initialize_agent(
+            tools=tools_list,
+            llm=llm,
+            agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION,
+            verbose=True,
+        )
+    return _agent
 
 
 def run_agent_task(query: str):
@@ -20,6 +25,7 @@ def run_agent_task(query: str):
     Returns agent output or error as a dictionary.
     """
     try:
+        agent = _get_agent()
         result = agent.run(query)
         return result
     except Exception as e:
