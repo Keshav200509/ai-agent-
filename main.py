@@ -1,20 +1,21 @@
 # main.py
+import logging
+
 from dotenv import load_dotenv
-from agent.core import YouTubeCommunityAgent
-from agent.tools import ComposioTools
-from agent.rag import RAGIndex
 
 load_dotenv()
 
-# create mock clients (replace with real Composio & vector db clients)
-composio_client = None
-vector_client = None
-discord_bot = None
+from agent.core import AgentError, run_agent_task
 
-tools = ComposioTools(composio_client)
-rag = RAGIndex(vector_client)
-agent = YouTubeCommunityAgent(llm=None, tools=tools, rag=rag, discord_bot=discord_bot)
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # smoke-run
-res = agent.ingest_youtube_video("https://www.youtube.com/watch?v=EXAMPLE", source_user="teacher@example.com")
-print(res)  # should return dict per contract; fill internals step by step
+if __name__ == "__main__":
+    try:
+        res = run_agent_task("Summarise the latest Discord message and email it.")
+        print("Result:", res)
+    except AgentError as err:
+        logger.error("Smoke-run failed: %s", err)
+    except Exception as err:
+        logger.exception("Unexpected error during smoke-run")

@@ -1,27 +1,16 @@
-# # test_agent.py (new file for testing)
-# from agent.core import run_agent_task
-
-# query = """
-# Fetch the most recent message from my Discord channel with ID 123456789012345678
-# and send it as an email to my address: your_email@gmail.com
-# """
-
-# result = run_agent_task(query)
-# print("Result:", result)
-
-
 # agent/test_agent.py
+import os
+
+import pytest
 from dotenv import load_dotenv
+
 load_dotenv()
 
-# --- Keep the rest of your imports below ---
-from agent.core import run_agent_task
-import os
-import pytest
+from agent.core import AgentError, run_agent_task
+
 
 def test_discord_to_gmail_drive_workflow():
-    """
-    Full integration test:
+    """Full integration test:
     1. Fetch latest message from a test Discord channel.
     2. Send the message as an email via Gmail.
     3. Upload that message as a file to Google Drive.
@@ -31,7 +20,9 @@ def test_discord_to_gmail_drive_workflow():
     drive_folder = os.getenv("GOOGLE_DRIVE_FOLDER_ID", "root")
 
     # Step 1: Fetch Discord message
-    message = run_agent_task(f"Get the latest message from Discord channel {discord_channel_id}")
+    message = run_agent_task(
+        f"Get the latest message from Discord channel {discord_channel_id}"
+    )
     assert message is not None and isinstance(message, str)
 
     # Step 2: Send message via Gmail
@@ -46,6 +37,15 @@ def test_discord_to_gmail_drive_workflow():
     )
     assert "error" not in str(upload_res).lower()
     print("Integration workflow successful.")
+
+
+def test_run_agent_task_rejects_empty_query():
+    """run_agent_task must raise AgentError on blank input."""
+    with pytest.raises(AgentError):
+        run_agent_task("")
+    with pytest.raises(AgentError):
+        run_agent_task("   ")
+
 
 # Allow CLI running
 if __name__ == "__main__":
