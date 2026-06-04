@@ -1,24 +1,17 @@
-# # test_agent.py (new file for testing)
-# from agent.core import run_agent_task
-
-# query = """
-# Fetch the most recent message from my Discord channel with ID 123456789012345678
-# and send it as an email to my address: your_email@gmail.com
-# """
-
-# result = run_agent_task(query)
-# print("Result:", result)
-
-
 # agent/test_agent.py
-from dotenv import load_dotenv
-load_dotenv()
-
-# --- Keep the rest of your imports below ---
-from agent.core import run_agent_task
 import os
+
 import pytest
 
+from agent.core import run_agent_task
+
+requires_credentials = pytest.mark.skipif(
+    not os.getenv("GEMINI_API_KEY"),
+    reason="GEMINI_API_KEY not set — skipping integration test",
+)
+
+
+@requires_credentials
 def test_discord_to_gmail_drive_workflow():
     """
     Full integration test:
@@ -46,6 +39,7 @@ def test_discord_to_gmail_drive_workflow():
     )
     assert "error" not in str(upload_res).lower()
     print("Integration workflow successful.")
+
 
 # Allow CLI running
 if __name__ == "__main__":
