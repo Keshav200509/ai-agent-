@@ -16,11 +16,13 @@ llm = ChatGoogleGenerativeAI(
 )
 
 # 3. Create the Agent using LangChain 0.1.16 compatible method
+# verbose=False in production to avoid leaking internal reasoning chains.
+# Set DEBUG_AGENT=1 in the environment to enable verbose output for debugging.
 agent = initialize_agent(
     tools=tools_list, 
     llm=llm,
     agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION,
-    verbose=True,
+    verbose=bool(os.getenv("DEBUG_AGENT")),
 )
 
 # 4. Agent runner function for integration with scripts/tests
