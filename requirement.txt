@@ -3,4 +3,4 @@ langchain-google-genai
 composio-langchain
 python-dotenv
 pytest
-langchain-agents
+fastapi
