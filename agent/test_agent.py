@@ -26,8 +26,8 @@ def test_discord_to_gmail_drive_workflow():
     2. Send the message as an email via Gmail.
     3. Upload that message as a file to Google Drive.
     """
-    discord_channel_id = os.getenv("TEST_DISCORD_CHANNEL_ID", "dummy_channel")
-    email_to = os.getenv("GMAIL_ADDRESS", "your_email@gmail.com")
+    discord_channel_id = os.getenv("TEST_DISCORD_CHANNEL_ID", "1362214347065000098")
+    email_to = os.getenv("GMAIL_ADDRESS", "keshavyadav0.ky@gmail.com")
     drive_folder = os.getenv("GOOGLE_DRIVE_FOLDER_ID", "root")
 
     # Step 1: Fetch Discord message
